@@ -1,0 +1,183 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformando Vidas - Faça sua Doação</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- Tela Inicial -->
+        <section id="initial-screen" class="screen active">
+            <header class="main-header">
+                <img src="logo.png" alt="Logo Transformando Vidas" class="logo">
+            </header>
+            <main>
+                <div class="hero">
+                    <img src="hero-image.png" alt="Crianças e Idosos Sorrindo" class="hero-image">
+                    <h1>Sua doação transforma vidas.</h1>
+                    <p class="subtitle">Apoie crianças e idosos carentes, faça alguém sorrir hoje!</p>
+                </div>
+                <div class="call-to-action">
+                    <h2>Doe a partir de <strong>R$30</strong> e seja a razão do sorriso de uma família.</h2>
+                    <button id="start-donation-button" class="btn btn-primary btn-pulse">Quero Doar Agora</button>
+                </div>
+            </main>
+        </section>
+
+        <!-- Tela de Formulário -->
+        <section id="form-screen" class="screen">
+            <header class="form-header">
+                <img src="logo.png" alt="Logo Transformando Vidas" class="logo-small">
+                <h2>Faça sua Doação</h2>
+                <p>Preencha os dados abaixo para continuar.</p>
+            </header>
+            <form id="donation-form">
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="sobrenome">Sobrenome</label>
+                    <input type="text" id="sobrenome" name="sobrenome" required>
+                </div>
+                <div class="form-group">
+                    <label for="cpf_cnpj">CPF ou CNPJ</label>
+                    <input type="text" id="cpf_cnpj" name="cpf_cnpj" required>
+                    <small id="company-info" class="hidden">Empresas podem abater parte do valor doado do imposto. Faça a diferença!</small>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefone">Telefone</label>
+                    <input type="tel" id="telefone" name="telefone" required>
+                </div>
+                <div class="form-group">
+                    <label for="sexo">Sexo</label>
+                    <select id="sexo" name="sexo" required>
+                        <option value="">Selecione...</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="nascimento">Data de Nascimento</label>
+                    <input type="text" id="nascimento" name="nascimento" placeholder="DD/MM/AAAA" required>
+                </div>
+                
+                <div class="donation-values">
+                    <h3>Escolha o valor</h3>
+                    <div class="value-options">
+                        <button type="button" class="btn value-btn" data-value="30">R$ 30</button>
+                        <button type="button" class="btn value-btn" data-value="50">R$ 50</button>
+                        <button type="button" class="btn value-btn" data-value="100">R$ 100</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="valor">Ou digite outro valor</label>
+                        <input type="number" id="valor" name="valor" placeholder="R$ 0,00" min="1" required>
+                    </div>
+                </div>
+                
+                <div class="form-group-checkbox">
+                    <input type="checkbox" id="recorrente" name="recorrente">
+                    <label for="recorrente">Tornar esta doação mensal</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-pulse">Realizar Doação</button>
+                 <button type="button" id="back-to-initial" class="btn btn-secondary">Voltar</button>
+            </form>
+        </section>
+
+        <!-- Tela do PIX -->
+        <section id="pix-screen" class="screen">
+            <div class="pix-container">
+                <h2>Quase lá!</h2>
+                <p>Sua doação será via PIX. Copie o código abaixo e pague no app do seu banco.</p>
+                <div class="pix-key-wrapper">
+                    <input type="text" id="pix-key-display" readonly>
+                    <button id="copy-pix-key" class="btn">Copiar</button>
+                </div>
+                <p class="pix-instruction"><strong>Após realizar o pagamento, clique no botão abaixo para confirmar.</strong></p>
+                <button id="confirm-payment-button" class="btn btn-primary btn-pulse">Já fiz minha doação</button>
+            </div>
+        </section>
+
+        <!-- Tela do Comprovante -->
+        <section id="receipt-screen" class="screen">
+            <div class="receipt">
+                <div class="receipt-header">
+                    <img src="logo.png" alt="Logo" class="logo-small">
+                    <h3>Comprovante de Doação</h3>
+                </div>
+                <div class="receipt-body">
+                    <div class="receipt-line"><span>Data e Hora:</span> <span id="receipt-datetime"></span></div>
+                    <div class="receipt-line"><span>Doador:</span> <span id="receipt-name"></span></div>
+                    <div class="receipt-line"><span>Valor Doado:</span> <span id="receipt-value"></span></div>
+                    <div class="receipt-line"><span>Tipo:</span> <span id="receipt-type"></span></div>
+                    <div class="receipt-line"><span>ID da Transação:</span> <span id="receipt-id"></span></div>
+                </div>
+                <div class="receipt-footer">
+                    <p id="receipt-message">Muito obrigado! Sua solidariedade ilumina caminhos.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Tela de Agradecimento (Placeholder, ativada por JS) -->
+        <section id="thankyou-screen" class="screen">
+            <h1>Obrigado por transformar vidas!</h1>
+            <div class="heart-animation">❤️</div>
+        </section>
+
+        <!-- Seção de Parceiros e Feedbacks (visível na tela inicial) -->
+        <div id="shared-sections">
+            <section class="partners-section">
+                <h2>Nossos Parceiros</h2>
+                <div class="partner-logos">
+                    <img src="bank-santander.png" alt="Logo Santander">
+                    <img src="bank-itau.png" alt="Logo Itaú">
+                    <img src="bank-bradesco.png" alt="Logo Bradesco">
+                    <img src="bank-bb.png" alt="Logo Banco do Brasil">
+                    <img src="partner-zoo.png" alt="Logo Zoológico Parceiro">
+                </div>
+            </section>
+    
+            <section class="feedback-section">
+                <h2>O que dizem nossos doadores</h2>
+                <div class="feedback-cards">
+                    <div class="card">
+                        <img src="feedback-ana.png" alt="Foto de Ana P.">
+                        <p>"Fazer minha doação aqui foi simples e rápido. Saber que estou ajudando crianças e idosos me deixa com o coração leve. Recomendo a todos!"</p>
+                        <strong>— Ana P.</strong>
+                    </div>
+                    <div class="card">
+                        <img src="feedback-carlos.png" alt="Foto de Carlos M.">
+                        <p>"A transparência do app me conquistou. Recebi meu comprovante personalizado e isso me dá confiança para continuar ajudando."</p>
+                        <strong>— Carlos M.</strong>
+                    </div>
+                    <div class="card">
+                        <img src="feedback-ricardo.png" alt="Foto de Ricardo T.">
+                        <p>"Minha empresa adotou essa causa e já estamos colhendo frutos positivos. É gratificante ajudar e ainda ter benefícios fiscais."</p>
+                        <strong>— Ricardo T. (Empresa Doadora)</strong>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <footer class="main-footer">
+        <p><strong>Ambiente 100% Seguro.</strong> Seus dados estão protegidos.</p>
+        <p>Doar é um ato de amor e esperança. Cada contribuição constrói um futuro melhor.</p>
+        <p>&copy; 2024 Transformando Vidas. Todos os direitos reservados.</p>
+    </footer>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
