@@ -15,7 +15,16 @@ const companyInfo = document.getElementById('company-info');
 const valueButtons = document.querySelectorAll('.value-btn');
 const valueInput = document.getElementById('valor');
 
+// --- Elementos do Novo Contador
+const donationCounterElement = document.getElementById('donation-counter');
+let donationCount = 237000; // Começa em 237 mil
+
 let formData = {};
+
+// --- Funções Auxiliares
+function formatNumber(num) {
+    return num.toLocaleString('pt-BR');
+}
 
 // --- Navegação entre Telas
 function showScreen(screenId) {
@@ -187,6 +196,17 @@ function startThankYouLoop() {
     }, 5000);
 }
 
+// --- Funções do Contador Personalizado
+function startDonationCounter() {
+    // Atualiza o contador a cada 10 segundos
+    setInterval(() => {
+        donationCount += 3;
+        if (donationCounterElement) {
+            donationCounterElement.textContent = formatNumber(donationCount);
+        }
+    }, 10000);
+}
+
 // --- Inicialização e Reset
 function resetApp() {
     donationForm.reset();
@@ -202,6 +222,7 @@ function init() {
     
     setupFormListeners();
     setupPixScreenListeners();
+    startDonationCounter(); // Chama a nova função do contador
     
     showScreen('initial-screen');
 }
