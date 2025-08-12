@@ -17,7 +17,7 @@ const valueInput = document.getElementById('valor');
 
 // --- Elementos do Novo Contador
 const donationCounterElement = document.getElementById('donation-counter');
-let donationCount = 237000; // Começa em 237 mil
+let donationCount = 37000; // Começa em 37 mil
 
 let formData = {};
 
