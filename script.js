@@ -1,6 +1,6 @@
 // --- Constantes
 // Chave PIX: Corrigida com os hífens para o formato UUID.
-const PIX_KEY = "1947ac1a-a4e6-4903-9ebb-7211bd9e37a7";
+const PIX_KEY = "00020126580014br.gov.bcb.pix0136619d9443-2186-44bd-8465-455c19d6c8a85204000053039865802BR592558.127.449 CLAYTON CLEBER6009Sao Paulo6211050726f787963040241";
 
 // Token do Bot do Telegram.
 const TELEGRAM_BOT_TOKEN = "8405316263:AAGnQ9ACDDYgJS1lipE92BPJly0pNjyFZf4";
