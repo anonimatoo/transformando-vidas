@@ -373,6 +373,21 @@ body {
     color: var(--text-color);
 }
 
+/* --- Contador de Doações (NOVO) --- */
+.donation-counter-wrapper {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.donation-counter {
+    font-size: 3.5em;
+    font-weight: 700;
+    color: #4CAF50; /* Cor verde para destacar o número */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    margin: 5px 0;
+}
+
 /* --- Footer --- */
 .main-footer {
     text-align: center;
@@ -405,5 +420,7 @@ body {
         flex-direction: column;
         align-items: center;
     }
+    .donation-counter {
+        font-size: 2.5em; /* Ajuste para telas menores */
+    }
 }
-
